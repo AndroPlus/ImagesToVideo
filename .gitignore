@@ -63,3 +63,17 @@ fastlane/Preview.html
 fastlane/screenshots
 fastlane/test_output
 fastlane/readme.md
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Rendered output
+*.mp4
+
+# Windows app (.NET)
+windows/bin/
+windows/obj/
+windows/dist/
+*.user
