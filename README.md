@@ -8,14 +8,50 @@ photo, **transitions** between them, and optional **music**.
 > **Built with [Claude Code](https://claude.com/claude-code) and the [REA MCP](https://github.com/morluto/rea).**
 > Claude used REA (Reverse Engineer Anything) to study how an installed video editor (Wondershare Filmora)
 > builds photo slideshows. It found that pan & zoom is a keyframed crop rectangle and catalogued the
-> transitions. Claude then wrote this tool from scratch based on what it learned.
+> transitions. Claude then wrote this tool from scratch based on what it learned: first as a Python
+> command-line engine, then as a native Windows app (C#/WPF), matching the reference app's native stack.
 > [FINDINGS.md](FINDINGS.md) has the evidence, and records what was observed separately from the design
 > choices made here. Nothing from Filmora was copied.
 
-## Quick start
+This repo has **two versions of the same engine**:
 
-You need Python 3.10 or newer and [FFmpeg](https://ffmpeg.org/) on your PATH (on Windows,
-`winget install Gyan.FFmpeg`).
+| | Windows app (`windows/`) | Command line (`imagestovideo/`) |
+|---|---|---|
+| Language | C# / WPF on .NET 9, Fluent theme | Python 3.10+ |
+| Use it to | Add or drop photos, reorder them, preview live, and export with a progress bar | Script it, batch jobs, any OS |
+| Engine | The same pan & zoom presets and 7 transitions, ported 1:1 | The original implementation |
+| Output | H.264 MP4 through FFmpeg | H.264 MP4 through FFmpeg |
+
+Both need [FFmpeg](https://ffmpeg.org/) (on Windows: `winget install Gyan.FFmpeg`).
+
+## Windows app
+
+![ImagesToVideo Windows app: photo list, live preview with scrubber, and settings](docs/windows-app.png)
+
+**Install:** with the [.NET 9 SDK](https://dotnet.microsoft.com/download) installed, double-click `windows\build.bat`.
+It publishes a single-file `ImagesToVideo.exe` (about 260 KB, using the .NET 9 Desktop Runtime) and installs
+it to `%LOCALAPPDATA%\Programs\ImagesToVideo`, with Start Menu and Desktop shortcuts. To uninstall:
+
+```bash
+powershell -ExecutionPolicy Bypass -File windows\install.ps1 -Uninstall
+```
+
+**Use:**
+- **Add photos:** use **Add photos** or **Add folder**, drag files or folders onto the window, or pass them on
+  the command line (`ImagesToVideo.exe C:\Photos\Trip`).
+- **Reorder:** move up/down, sort by name, or remove (Delete).
+- **Preview:** drag the scrubber or press **Space** to play. Clicking a photo jumps the preview to it.
+- **Settings:** size (Full HD, HD, 4K, vertical, square), frame rate, seconds per photo, transition and its length,
+  pan & zoom preset and amount, easing, photo fit, and music. They're remembered between sessions.
+- **Export video:** pick a file, then watch progress with a time estimate. Cancel any time. When it's done, use
+  **Play video** or **Show in folder**.
+
+The app's code is in `windows/`: `Engine/` (frame buffers, pan & zoom, transitions, timeline and FFmpeg
+export) and `MainWindow.xaml(.cs)` (the UI).
+
+## Command line
+
+You need Python 3.10 or newer and FFmpeg on your PATH.
 
 ```bash
 pip install -r requirements.txt
@@ -25,7 +61,7 @@ python -m imagestovideo path/to/photos -o holiday.mp4
 The defaults are 1080p at 30 fps, 4 seconds per photo, 1-second transitions, and a different pan & zoom and
 transition for each photo.
 
-## Examples
+### Examples
 
 ```bash
 # Vertical video for reels/shorts, with music
@@ -41,7 +77,7 @@ python -m imagestovideo photos -o fast.mp4 --transition random --zoom 0.3 --dura
 python -m imagestovideo photos -o kenburns.mp4 --zoom 0.5
 ```
 
-## Options
+### Options
 
 | Option | Default | Description |
 |---|---|---|
@@ -61,7 +97,7 @@ python -m imagestovideo photos -o kenburns.mp4 --zoom 0.5
 | `--crf` | `18` | x264 quality (lower is better) |
 | `--seed` | | Makes `--transition random` repeatable |
 
-## Use it from Python
+### Use it from Python
 
 ```python
 from imagestovideo import Settings, collect_images, render
@@ -70,7 +106,7 @@ files = collect_images(["photos"])
 render(files, "out.mp4", Settings(size=(1280, 720), transition="cross_zoom", motion="auto"))
 ```
 
-## How it works
+## How the engine works
 
 - **`imagestovideo/panzoom.py`:** each photo is fitted to the output aspect ratio (cropped, or placed on a
   blurred background) on a canvas slightly larger than the output. Each motion preset is a pair of crop

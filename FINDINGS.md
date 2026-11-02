@@ -56,3 +56,11 @@ Evaporate 1.
 | Linear-looking interpolation | Default `--easing linear`, plus `smooth` and `sine` options |
 | GPU shader transitions | Seven transitions written from scratch in numpy: fade, fade_black, wipe, push, cross_zoom, circle and pixelate |
 | (Not observed; an added design choice) | `--fit auto` puts portrait photos on a blurred background instead of cropping heads off, and `--audio` adds music with fades |
+
+## Windows app
+
+The reference app is native (C++/Qt), so the repo also ships a native Windows app in `windows/` (C# / WPF on
+.NET 9). Its `Engine/` is a 1:1 port of the Python engine. It uses the same crop-rectangle pan & zoom presets and
+zoom setting, the same seven transitions with the same maths, and the same timeline (photos overlap by the
+transition length, and motion runs through the transitions). Rendered frames match the Python output. Both
+stream raw frames into FFmpeg for H.264 encoding.

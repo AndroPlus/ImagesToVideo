@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>ImagesToVideo</AssemblyName>
+    <RootNamespace>ImagesToVideo</RootNamespace>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>assets\icon.ico</ApplicationIcon>
+    <Version>1.0.0</Version>
+    <Product>ImagesToVideo</Product>
+    <Description>Turn a list of images into a video with pan &amp; zoom and transitions. Built with Claude Code and the REA MCP.</Description>
+    <!-- WPF Fluent theme (ThemeMode) is marked experimental in .NET 9. -->
+    <NoWarn>$(NoWarn);WPF0001</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Resource Include="assets\icon.ico" />
+    <None Remove="assets\icon.png" />
+  </ItemGroup>
+
+</Project>

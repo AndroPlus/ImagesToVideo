@@ -71,3 +71,9 @@ __pycache__/
 
 # Rendered output
 *.mp4
+
+# Windows app (.NET)
+windows/bin/
+windows/obj/
+windows/dist/
+*.user
